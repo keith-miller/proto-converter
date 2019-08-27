@@ -25,3 +25,9 @@ hs_err_pid*
 # Jetbrains ignores
 .idea/
 *.iml
+
+# Gradle ignores
+.gradle/
+
+# Build ignores
+build/
