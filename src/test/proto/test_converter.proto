@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+// define the Java settings
+option java_package = "com.keithmiller.prototest";
+option java_multiple_files = true;
+
+package prototest;
+
+message TestConvertMessage {
+    string entity_id = 1;
+    string name = 2;
+    int32 count = 3;
+    string sub_entity_id = 4;
+}

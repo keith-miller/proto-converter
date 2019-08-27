@@ -71,3 +71,8 @@ sourceSets {
         }
     }
 }
+
+test {
+    exclude 'com/keithmiller/prototest/**'
+    exclude 'com/keithmiller/protoconverter/example/**'
+}
