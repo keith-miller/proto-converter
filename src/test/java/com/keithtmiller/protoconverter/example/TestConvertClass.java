@@ -1,7 +1,7 @@
-package com.keithmiller.protoconverter.example;
+package com.keithtmiller.protoconverter.example;
 
-import com.keithmiller.protoconverter.ProtoClass;
-import com.keithmiller.protoconverter.ProtoField;
+import com.keithtmiller.protoconverter.ProtoClass;
+import com.keithtmiller.protoconverter.ProtoField;
 import lombok.Builder;
 import lombok.Getter;
 

@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 // define the Java settings
-option java_package = "com.keithmiller.prototest";
+option java_package = "com.keithtmiller.prototest";
 option java_multiple_files = true;
 
 package prototest;

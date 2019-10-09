@@ -19,7 +19,6 @@ plugins {
     id 'java-library'
     id 'idea'
     id 'com.google.protobuf' version '0.8.10'
-
 }
 
 sourceCompatibility = 11.0
@@ -73,6 +72,6 @@ sourceSets {
 }
 
 test {
-    exclude 'com/keithmiller/prototest/**'
-    exclude 'com/keithmiller/protoconverter/example/**'
+    exclude 'com/keithtmiller/prototest/**'
+    exclude 'com/keithtmiller/protoconverter/example/**'
 }

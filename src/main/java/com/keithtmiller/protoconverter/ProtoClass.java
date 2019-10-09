@@ -1,4 +1,4 @@
-package com.keithmiller.protoconverter;
+package com.keithtmiller.protoconverter;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

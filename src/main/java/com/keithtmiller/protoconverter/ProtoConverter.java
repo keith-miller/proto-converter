@@ -1,4 +1,4 @@
-package com.keithmiller.protoconverter;
+package com.keithtmiller.protoconverter;
 
 import com.google.protobuf.GeneratedMessageV3;
 import org.apache.commons.lang3.tuple.Pair;

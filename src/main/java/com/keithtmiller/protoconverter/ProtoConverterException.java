@@ -1,4 +1,4 @@
-package com.keithmiller.protoconverter;
+package com.keithtmiller.protoconverter;
 
 public class ProtoConverterException extends Exception {
     public ProtoConverterException(String message) {

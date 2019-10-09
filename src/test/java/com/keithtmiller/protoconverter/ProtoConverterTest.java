@@ -1,8 +1,8 @@
-package com.keithmiller.protoconverter;
+package com.keithtmiller.protoconverter;
 
-import com.keithmiller.protoconverter.example.TestConvertClass;
-import com.keithmiller.protoconverter.example.TestConvertSubClass;
-import com.keithmiller.prototest.TestConvertMessage;
+import com.keithtmiller.protoconverter.example.TestConvertClass;
+import com.keithtmiller.protoconverter.example.TestConvertSubClass;
+import com.keithtmiller.prototest.TestConvertMessage;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
 
