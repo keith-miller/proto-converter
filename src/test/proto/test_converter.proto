@@ -10,5 +10,10 @@ message TestConvertMessage {
     string entity_id = 1;
     string name = 2;
     int32 count = 3;
-    string sub_entity_id = 4;
+    TestConvertSubMessage testConvertSubMessage = 4;
+}
+
+message TestConvertSubMessage {
+    string entity_id = 1;
+    string name = 2;
 }

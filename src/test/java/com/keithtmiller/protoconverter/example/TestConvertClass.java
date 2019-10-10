@@ -2,6 +2,7 @@ package com.keithtmiller.protoconverter.example;
 
 import com.keithtmiller.protoconverter.ProtoClass;
 import com.keithtmiller.protoconverter.ProtoField;
+import com.keithtmiller.prototest.TestConvertSubMessage;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -13,12 +14,10 @@ public class TestConvertClass {
     @ProtoField(setter = "setEntityId", castingMethod = "toString")
     private UUID id;
 
-    @ProtoField(setter = "setName")
     private String name;
 
-    @ProtoField(setter = "setCount")
     private Integer count;
 
-    @ProtoClass
+    @ProtoClass(setterName = "setTestConvertSubMessage", setterClass = TestConvertSubMessage.class)
     private TestConvertSubClass testConvertSubClass;
 }

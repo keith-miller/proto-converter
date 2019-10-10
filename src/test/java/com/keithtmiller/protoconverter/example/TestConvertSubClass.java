@@ -9,6 +9,8 @@ import java.util.UUID;
 @Getter
 @Builder
 public class TestConvertSubClass {
-    @ProtoField(setter = "setSubEntityId", castingMethod = "toString")
+    @ProtoField(setter = "setEntityId", castingMethod = "toString")
     private UUID id;
+
+    private String name;
 }

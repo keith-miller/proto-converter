@@ -1,5 +1,5 @@
 # proto-converter
-An Annotation based Java library for converting classes (like DTOs) to Protobuf classes
+An Annotation based Java 11 and higher library for converting classes (like DTOs) to Protobuf classes
 
 # How to use
 ## Add dependency
@@ -8,10 +8,10 @@ An Annotation based Java library for converting classes (like DTOs) to Protobuf 
 <dependency>
     <groupId>com.keithtmiller</groupId>
     <artifactId>proto-converter</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 ### Gradle
 ```groovy
-compile group: 'com.keithtmiller', name: 'proto-converter', version: '1.0.0'
+implementation group: 'com.keithtmiller', name: 'proto-converter', version: '1.0.1'
 ```

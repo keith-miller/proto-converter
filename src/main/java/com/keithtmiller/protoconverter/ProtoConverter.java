@@ -47,6 +47,7 @@ public class ProtoConverter {
      * @param builder - the GeneratedMessageV3.Builder class
      * @throws ProtoConverterException - occurs if the field cannot be converted
      */
+    @SuppressWarnings("unchecked")
     private static <BUILDER extends GeneratedMessageV3.Builder> void processFields(Object object,
                                                                                    Class clazz,
                                                                                    BUILDER builder) throws ProtoConverterException {
@@ -90,19 +91,48 @@ public class ProtoConverter {
                     // get the field value
                     var fieldValue = field.get(object);
 
-                    // Entities can have child entities that are null
                     if(fieldValue != null) {
-                        processFields(fieldValue, fieldValue.getClass(), builder);
+                        // get the sub class builder
+                        var fieldAnnotation = field.getAnnotation(ProtoClass.class);
+                        var builderMethod = fieldAnnotation.setterClass().getMethod("newBuilder");
+                        var fieldBuilder = (BUILDER) builderMethod.invoke(null);
+
+                        // process the sub class fields
+                        processFields(fieldValue, field.getType(), fieldBuilder);
+
+                        // set the parent field
+                        var setter = ProtoConverter.getSetter(builder, fieldAnnotation.setterName());
+                        setter.invoke(builder, fieldBuilder.build());
                     }
-                } catch (IllegalAccessException | NullPointerException e) {
+
+                } catch (IllegalAccessException | NullPointerException | NoSuchMethodException | InvocationTargetException e) {
                     throw new ProtoConverterException(String.format("Error accessing ProtoEntity: %s", field.getName()), e);
                 }
+            } else {
+                // attempt the default setter lookup, ignore if not found
+                var setterName = String.format("set%s", field.getName().substring(0,1).toUpperCase() + field.getName().substring(1));
+
+                try {
+                    // set it to accessible
+                    field.setAccessible(true);
+
+                    // get the field value
+                    var fieldValue = field.get(object);
+
+                    // get the setter method for the proto class
+                    var setter = ProtoConverter.getSetter(builder, setterName);
+
+                    // get the class of the setter param
+                    var setterClass = setter.getParameterTypes()[0];
+
+                    setter.invoke(builder, checkValue(setterClass, fieldValue));
+                } catch (Exception ignored) { }
             }
         }
     }
 
     /**
-     * We need to be able to handle custom mapping even with the above annotation processing (e.g. card sub type, color)
+     * We need to be able to handle custom mapping even with the above annotation processing for advanced mapping
      *
      * @param builder - the GeneratedMessageV3.Builder class
      * @param customMapping - Map of method names and a Pair of class and object to set
