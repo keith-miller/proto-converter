@@ -16,9 +16,12 @@ public class ProtoConverter {
      * @param object - Java object we are converting
      * @param builder - the GeneratedMessageV3.Builder class
      * @param customMapping - Map of method names and a Pair of class and object to set
+     * @param <BUILDER> - The generated Protobuf Builder class
+     * @param <PROTO> - The generated Protobuf class
      * @return the resulting GeneratedMessageV3 Protobuf object
-     * @throws ProtoConverterException
+     * @throws ProtoConverterException - thrown is the object passed in is null
      */
+    @SuppressWarnings("unchecked")
     public static <BUILDER extends GeneratedMessageV3.Builder,
             PROTO extends GeneratedMessageV3> PROTO convertToMessage(Object object,
                                                                      BUILDER builder,
@@ -42,7 +45,7 @@ public class ProtoConverter {
      * @param object - Java object we are converting
      * @param clazz - Class of the Java object we are converting
      * @param builder - the GeneratedMessageV3.Builder class
-     * @throws ProtoConverterException
+     * @throws ProtoConverterException - occurs if the field cannot be converted
      */
     private static <BUILDER extends GeneratedMessageV3.Builder> void processFields(Object object,
                                                                                    Class clazz,
@@ -103,7 +106,7 @@ public class ProtoConverter {
      *
      * @param builder - the GeneratedMessageV3.Builder class
      * @param customMapping - Map of method names and a Pair of class and object to set
-     * @throws ProtoConverterException
+     * @throws ProtoConverterException - occurs when the custom mapping cannot be processed
      */
     private static <BUILDER extends GeneratedMessageV3.Builder> void processCustomMapping(BUILDER builder,
                                                                                           Map<String, Pair<Class<?>, Object>> customMapping)

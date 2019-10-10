@@ -19,7 +19,13 @@ plugins {
     id 'java-library'
     id 'idea'
     id 'com.google.protobuf' version '0.8.10'
+    id 'maven'
+    id 'signing'
 }
+
+group = 'com.keithtmiller'
+archivesBaseName = 'proto-converter'
+version = '1.0.0'
 
 sourceCompatibility = 11.0
 targetCompatibility = 11.0
@@ -75,3 +81,66 @@ test {
     exclude 'com/keithtmiller/prototest/**'
     exclude 'com/keithtmiller/protoconverter/example/**'
 }
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name 'Proto-Converter'
+                packaging 'jar'
+                description 'An Annotation based Java library for converting classes (like DTOs) to Protobuf classes'
+                url 'https://github.com/keith-miller/proto-converter'
+
+                scm {
+                    connection 'https://github.com/keith-miller/proto-converter.git'
+                    developerConnection 'https://github.com/keith-miller/proto-converter.git'
+                    url 'https://github.com/keith-miller/proto-converter.git'
+                }
+
+                licenses {
+                    license {
+                        name 'MIT License'
+                        url 'https://opensource.org/licenses/MIT'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'keith-miller'
+                        name 'Keith Miller'
+                        email 'keeftm@gmail.com'
+                    }
+                }
+            }
+        }
+    }
+}
+
