@@ -49,6 +49,7 @@ dependencies {
 
     testCompile group: 'junit', name: 'junit', version: "${junit_version}"
     testCompile group: 'org.projectlombok', name: 'lombok', version: "${lombok_version}"
+    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: "${lombok_version}"
 }
 
 protobuf {
@@ -78,6 +79,8 @@ sourceSets {
 }
 
 test {
+    dependsOn 'generateTestProto'
+
     exclude 'com/keithtmiller/prototest/**'
     exclude 'com/keithtmiller/protoconverter/example/**'
 }

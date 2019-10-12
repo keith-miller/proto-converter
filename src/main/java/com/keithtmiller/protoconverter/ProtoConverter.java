@@ -5,10 +5,28 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.http.HttpClient;
 import java.util.*;
 
 public class ProtoConverter {
     private static final Map<Class<?>, Map<String, Optional<Method>>> converterCache = new LinkedHashMap<>();
+
+    /**
+     * Java object to GeneratedMessageV3 Protobuf object converter
+     *
+     * @param object - Java object we are converting
+     * @param builder - the GeneratedMessageV3.Builder class
+     * @param <BUILDER> - The generated Protobuf Builder class
+     * @param <PROTO> - The generated Protobuf class
+     * @return the resulting GeneratedMessageV3 Protobuf object
+     * @throws ProtoConverterException - thrown is the object passed in is null
+     */
+    public static <BUILDER extends GeneratedMessageV3.Builder,
+            PROTO extends GeneratedMessageV3> PROTO convertToMessage(Object object,
+                                                                     BUILDER builder)
+            throws ProtoConverterException {
+        return ProtoConverter.convertToMessage(object, builder, Collections.emptyMap());
+    }
 
     /**
      * Java object to GeneratedMessageV3 Protobuf object converter

@@ -6,14 +6,15 @@ option java_multiple_files = true;
 
 package prototest;
 
-message TestConvertMessage {
+// basic usage
+message BasicMessage {
     string entity_id = 1;
     string name = 2;
     int32 count = 3;
-    TestConvertSubMessage testConvertSubMessage = 4;
+    BasicChildMessage child = 4;
 }
 
-message TestConvertSubMessage {
+message BasicChildMessage {
     string entity_id = 1;
     string name = 2;
 }

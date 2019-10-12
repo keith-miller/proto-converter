@@ -26,8 +26,9 @@ hs_err_pid*
 .idea/
 *.iml
 
-# Gradle ignores
+# Gradle settings
 .gradle/
+!gradle/wrapper/*.jar
 
 # Build ignores
 build/
