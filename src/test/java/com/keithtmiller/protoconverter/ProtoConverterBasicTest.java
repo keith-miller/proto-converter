@@ -4,14 +4,14 @@ import com.keithtmiller.protoconverter.example.Basic;
 import com.keithtmiller.protoconverter.example.BasicChild;
 import com.keithtmiller.prototest.BasicMessage;
 import org.apache.commons.lang3.tuple.Pair;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class ProtoConverterTest {
+public class ProtoConverterBasicTest {
 
     @Test
     public void convertToMessage() throws Exception {
@@ -24,7 +24,7 @@ public class ProtoConverterTest {
                 .id(UUID.randomUUID())
                 .name("entity")
                 .count(5)
-                .basicChild(testSubEntity)
+                .child(testSubEntity)
                 .build();
 
         BasicMessage result = ProtoConverter.convertToMessage(testEntity, BasicMessage.newBuilder());
@@ -58,7 +58,7 @@ public class ProtoConverterTest {
                 .id(UUID.randomUUID())
                 .name("entity")
                 .count(1)
-                .basicChild(testSubEntity)
+                .child(testSubEntity)
                 .build();
 
         customMap.put("setEntityId", Pair.of(String.class, UUID.randomUUID().toString()));

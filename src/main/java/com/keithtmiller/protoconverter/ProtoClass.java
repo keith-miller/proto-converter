@@ -6,17 +6,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD})
+@Target({ElementType.TYPE})
 public @interface ProtoClass {
-    /**
-     * The mapped field setter name
-     * @return the mapped field setter name
-     */
-    String setterName();
-
     /**
      * The mapped field proto class
      * @return the mapped field proto class
      */
-    Class setterClass();
+    Class value();
 }

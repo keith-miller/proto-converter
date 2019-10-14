@@ -1,8 +1,6 @@
 package com.keithtmiller.protoconverter.example;
 
-import com.keithtmiller.protoconverter.ProtoClass;
 import com.keithtmiller.protoconverter.ProtoField;
-import com.keithtmiller.prototest.BasicChildMessage;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -18,6 +16,6 @@ public class Basic {
 
     private Integer count;
 
-    @ProtoClass(setterName = "setChild", setterClass = BasicChildMessage.class)
-    private BasicChild basicChild;
+    @ProtoField(setter = "setChild")
+    private BasicChild child;
 }
