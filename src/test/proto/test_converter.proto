@@ -18,3 +18,14 @@ message BasicChildMessage {
     string entity_id = 1;
     string name = 2;
 }
+
+// complex usage
+message ComplexMessage {
+    string name = 1;
+    repeated ComplexChildMessage childList = 2;
+    map<string, ComplexChildMessage> childMap = 3;
+}
+
+message ComplexChildMessage {
+    string name = 1;
+}

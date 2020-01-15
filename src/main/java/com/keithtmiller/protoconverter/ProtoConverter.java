@@ -66,60 +66,76 @@ public class ProtoConverter {
      * @param builder - the GeneratedMessageV3.Builder class
      * @throws ProtoConverterException - occurs if the field cannot be converted
      */
+    @SuppressWarnings("unchecked")
     private static <BUILDER extends GeneratedMessageV3.Builder> void processFields(Object object,
                                                                                    Class clazz,
                                                                                    BUILDER builder)
             throws ProtoConverterException {
         for (var field : clazz.getDeclaredFields()) {
+            // set it to accessible
+            field.setAccessible(true);
+
+            // get the field value
+            Object fieldValue;
+
+            try {
+                fieldValue = field.get(object);
+            } catch (IllegalAccessException e) {
+                throw new ProtoConverterException(String.format("Error accessing field: %s", field.getName()), e);
+            }
+
+            if(fieldValue == null) {
+                continue;
+            }
+
             if (field.isAnnotationPresent(ProtoField.class)) {
-                // get the field annotation
                 var fieldAnnotation = field.getAnnotation(ProtoField.class);
 
                 try {
-                    // set it to accessible
-                    field.setAccessible(true);
-
-                    // get the field value
-                    var fieldValue = field.get(object);
-                    if(fieldValue == null) {
-                        continue;
-                    }
-
-                    if(field.getType().isAnnotationPresent(ProtoClass.class)) {
-                        convertProtoClass(field, fieldValue, builder, fieldAnnotation.setter());
-                    } else {
-                        // get the setter method for the proto class
-                        var setter = getSetter(builder, fieldAnnotation.setter());
-
-                        // get the class of the setter param
-                        var setterClass = setter.getParameterTypes()[0];
-
-                        if (fieldAnnotation.castingMethod().length() > 0) {
-                            // force casting by calling casting method
-                            var getter = fieldValue.getClass().getMethod(fieldAnnotation.castingMethod());
-                            var castedFieldValue = getter.invoke(fieldValue);
-
-                            // call the setter with the field value from the object
-                            setter.invoke(builder, checkValue(setterClass, castedFieldValue));
-                        } else {
-                            // call the setter with the field value from the object
-                            setter.invoke(builder, checkValue(setterClass, fieldValue));
-                        }
-                    }
+                    convertField(builder, field, fieldValue, fieldAnnotation);
                 } catch (Exception e) {
                     throw new ProtoConverterException(String.format("Error converting field: %s", field.getName()), e);
+                }
+            } else if (field.isAnnotationPresent(ProtoCollection.class)) {
+                if(!(fieldValue instanceof Collection<?>)) {
+                    throw new ProtoConverterException(String.format("Field %s has been assigned the ProtoCollection " +
+                            "annotation but it is not a collection", field.getName()));
+                }
+
+                var fieldAnnotation = field.getAnnotation(ProtoCollection.class);
+                var collection = initializeList(fieldAnnotation.clazz());
+
+                try {
+                    for (var item : (Collection<?>) fieldValue) {
+                        System.out.println(String.format("HERE: %s", item.getClass().getName()));
+
+                        collection.add(checkValue(fieldAnnotation.clazz(), item));
+                    }
+
+                    var setter = getSetter(builder, fieldAnnotation.setter());
+                    setter.invoke(builder, collection);
+                } catch (Exception e) {
+                    throw new ProtoConverterException(String.format("Error converting collection field: %s", field.getName()), e);
+                }
+            } else if (field.isAnnotationPresent(ProtoMap.class)) {
+                if(!(fieldValue instanceof Map<?,?>)) {
+                    throw new ProtoConverterException(String.format("Field %s has been assigned the ProtoMap " +
+                            "annotation but it is not a map", field.getName()));
+                }
+
+                var fieldAnnotation = field.getAnnotation(ProtoMap.class);
+                var map = initializeMap(fieldAnnotation.setterKeyClass(), fieldAnnotation.setterValueClass());
+                try {
+                    var setter = getSetter(builder, fieldAnnotation.setter());
+                    setter.invoke(builder, map);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new ProtoConverterException(String.format("Error converting map field: %s", field.getName()), e);
                 }
             } else {
                 // attempt the default setter lookup, ignore if not found
                 var setterName = String.format("set%s", field.getName().substring(0,1).toUpperCase() + field.getName().substring(1));
 
                 try {
-                    // set it to accessible
-                    field.setAccessible(true);
-
-                    // get the field value
-                    var fieldValue = field.get(object);
-
                     // get the setter method for the proto class
                     var setter = ProtoConverter.getSetter(builder, setterName);
 
@@ -170,6 +186,39 @@ public class ProtoConverter {
         }
     }
 
+    private static <BUILDER extends GeneratedMessageV3.Builder> void convertField(BUILDER builder,
+                                                                                  Field field,
+                                                                                  Object fieldValue,
+                                                                                  ProtoField annotation)
+            throws IllegalAccessException, NoSuchMethodException, ProtoConverterException, InvocationTargetException, InstantiationException {
+        if(field.getType().isAnnotationPresent(ProtoClass.class)) {
+
+            var destAnnotation = field.getType().getAnnotation(ProtoClass.class);
+            var setter = getSetter(builder, destAnnotation.value(), setterName);
+
+            setter.invoke(builder, destAnnotation.value().cast(fieldBuilder.build()));
+            convertProtoClass(field, fieldValue, builder, annotation.setter());
+        } else {
+            // get the setter method for the proto class
+            var setter = getSetter(builder, annotation.setter());
+
+            // get the class of the setter param
+            var setterClass = setter.getParameterTypes()[0];
+
+            if (annotation.castingMethod().length() > 0) {
+                // force casting by calling casting method
+                var getter = fieldValue.getClass().getMethod(annotation.castingMethod());
+                var castedFieldValue = getter.invoke(fieldValue);
+
+                // call the setter with the field value from the object
+                setter.invoke(builder, checkValue(setterClass, castedFieldValue));
+            } else {
+                // call the setter with the field value from the object
+                setter.invoke(builder, checkValue(setterClass, fieldValue));
+            }
+        }
+    }
+
     private static <BUILDER extends GeneratedMessageV3.Builder> Method getSetter(BUILDER builder,
                                                                                  String setterName)
             throws ProtoConverterException {
@@ -216,7 +265,7 @@ public class ProtoConverter {
      * @throws ProtoConverterException - could not process the fields of the child class
      */
     @SuppressWarnings("unchecked")
-    private static <BUILDER extends GeneratedMessageV3.Builder> void convertProtoClass(Field field,
+    private static <BUILDER extends GeneratedMessageV3.Builder> Object convertProtoClass(Field field,
                                                                                        Object fieldValue,
                                                                                        BUILDER builder,
                                                                                        String setterName)
@@ -233,6 +282,14 @@ public class ProtoConverter {
         // process the sub class fields
         processFields(fieldValue, field.getType(), fieldBuilder);
 
-        setter.invoke(builder, destAnnotation.value().cast(fieldBuilder.build()));
+        return destAnnotation.value().cast(fieldBuilder.build());
+    }
+
+    private static <KEY,VALUE> Map<KEY,VALUE> initializeMap(Class<KEY> keyClass, Class<VALUE> valueClass) {
+        return new HashMap<>();
+    }
+
+    private static <T> List<T> initializeList(Class<T> clazz) {
+        return new ArrayList<>();
     }
 }
